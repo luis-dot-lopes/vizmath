@@ -12,7 +12,7 @@
 
 #define ROOT_RADIUS 7
 
-const Color root_color[] = { RED, GREEN };
+const Color root_color[] = { RED, GREEN, BLUE };
 
 typedef struct
 {
@@ -46,18 +46,14 @@ newton_method_polynomial(double complex x0, Polynomial* p)
 
 // assumes at least one root
 size_t
-closest_root(double complex z,
-             Polynomial* p,
-             double complex* roots,
-             size_t size_roots)
+closest_root(double complex z, double complex* roots, size_t size_roots)
 {
-  double computed_root = newton_method_polynomial(z, p);
 
   size_t min = 0;
-  double min_dist = cabs(roots[0] - computed_root);
+  double min_dist = cabs(roots[0] - z);
   double dist;
   for (size_t i = 1; i < size_roots; ++i) {
-    if ((dist = cabs(roots[i] - computed_root)) < min_dist) {
+    if ((dist = cabs(roots[i] - z)) < min_dist) {
       min = i;
       min_dist = dist;
     }
@@ -69,44 +65,51 @@ int
 main(void)
 {
 
-  const double complex roots[] = { 2.0 + 3.0 * I, 3.0 + 1.0 * I };
+  const double complex roots[] = { -2.0, 0.0, 3.0 + 1.0 * I };
   const size_t size_roots = sizeof(roots) / sizeof(roots[0]);
 
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Newton's Method");
 
-  SetTargetFPS(60);
+  RenderTexture2D texture = LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-  Polynomial p = { .degree = 2,
-                   .coeff = { 1.0, -5.0 - 4.0 * I, 3.0 + 11.0 * I } };
+  Polynomial p = { .degree = 3,
+                   .coeff = { 1.0, -1.0 - I, -6.0 - 2.0 * I, 0.0 } };
 
   int h = GetScreenHeight(), w = GetScreenWidth();
   double scale_x = w / (MAX_X * 2.0);
   double scale_y = h / (MAX_Y * 2.0);
 
   BeginDrawing();
+  BeginTextureMode(texture);
   {
-    DrawLine(0, h / 2, w, h / 2, WHITE);
-    DrawLine(w / 2, 0, w / 2, h, WHITE);
-
     for (int y = -h / 2; y <= h / 2; ++y) {
       for (int x = -w / 2; x <= w / 2; ++x) {
-        double complex z = (double)x / scale_x + (double)y / scale_y * I;
-        size_t i = closest_root(z, &p, (double complex*)roots, size_roots);
-        DrawPixel(x + w / 2, h / 2 - y, root_color[i]);
+        double complex z =
+          (double complex)x / scale_x + (double complex)y / scale_y * I;
+        double complex root = newton_method_polynomial(z, &p);
+        size_t i = closest_root(root, (double complex*)roots, size_roots);
+        DrawPixel(x + w / 2, h / 2 + y, root_color[i]);
       }
     }
     for (size_t i = 0; i < size_roots; ++i) {
       DrawCircle(w / 2 + scale_x * creal(roots[i]),
-                 h / 2 - scale_y * cimag(roots[i]),
+                 h / 2 + scale_y * cimag(roots[i]),
                  ROOT_RADIUS,
                  WHITE);
     }
+
+    DrawLine(0, h / 2, w, h / 2, WHITE);
+    DrawLine(w / 2, 0, w / 2, h, WHITE);
   }
+  EndTextureMode();
   EndDrawing();
 
-  printf("HI\n");
+  SetTargetFPS(60);
 
   while (!WindowShouldClose()) {
+    BeginDrawing();
+    DrawTexture(texture.texture, 0, 0, WHITE);
+    EndDrawing();
   }
 
   return 0;
