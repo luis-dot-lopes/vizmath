@@ -7,8 +7,8 @@
 #define ITERATIONS 10
 #define MAX_DEGREE 100
 
-#define MAX_X 8.0
-#define MAX_Y 6.0
+#define MAX_X 4.0
+#define MAX_Y 3.0
 
 #define ROOT_RADIUS 7
 
@@ -70,45 +70,73 @@ main(void)
 
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Newton's Method");
 
+  Shader shader = LoadShader(0, "newton.fs");
+
   RenderTexture2D texture = LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT);
 
   Polynomial p = { .degree = 3,
                    .coeff = { 1.0, -1.0 - I, -6.0 - 2.0 * I, 0.0 } };
 
+  int r1_loc = GetShaderLocation(shader, "r1");
+  int r2_loc = GetShaderLocation(shader, "r2");
+  int r3_loc = GetShaderLocation(shader, "r3");
+
+  int c0_loc = GetShaderLocation(shader, "c0");
+  int c1_loc = GetShaderLocation(shader, "c1");
+  int c2_loc = GetShaderLocation(shader, "c2");
+  int c3_loc = GetShaderLocation(shader, "c3");
+
+  float r1[] = { -2.0, 0.0 };
+  float r2[] = { 0.0, 0.0 };
+  float r3[] = { 3.0, 1.0 };
+
+  float c0[] = { 0.0, 0.0 };
+  float c1[] = { -6.0, -2.0 };
+  float c2[] = { -1.0, -1.0 };
+  float c3[] = { 1.0, 0.0 };
+
+  SetShaderValue(shader, r1_loc, r1, SHADER_UNIFORM_VEC2);
+  SetShaderValue(shader, r2_loc, r2, SHADER_UNIFORM_VEC2);
+  SetShaderValue(shader, r3_loc, r3, SHADER_UNIFORM_VEC2);
+
+  SetShaderValue(shader, c0_loc, c0, SHADER_UNIFORM_VEC2);
+  SetShaderValue(shader, c1_loc, c1, SHADER_UNIFORM_VEC2);
+  SetShaderValue(shader, c2_loc, c2, SHADER_UNIFORM_VEC2);
+  SetShaderValue(shader, c3_loc, c3, SHADER_UNIFORM_VEC2);
+
   int h = GetScreenHeight(), w = GetScreenWidth();
   double scale_x = w / (MAX_X * 2.0);
   double scale_y = h / (MAX_Y * 2.0);
 
-  BeginDrawing();
-  BeginTextureMode(texture);
-  {
-    for (int y = -h / 2; y <= h / 2; ++y) {
-      for (int x = -w / 2; x <= w / 2; ++x) {
-        double complex z =
-          (double complex)x / scale_x + (double complex)y / scale_y * I;
-        double complex root = newton_method_polynomial(z, &p);
-        size_t i = closest_root(root, (double complex*)roots, size_roots);
-        DrawPixel(x + w / 2, h / 2 + y, root_color[i]);
-      }
-    }
-    for (size_t i = 0; i < size_roots; ++i) {
-      DrawCircle(w / 2 + scale_x * creal(roots[i]),
-                 h / 2 + scale_y * cimag(roots[i]),
-                 ROOT_RADIUS,
-                 WHITE);
-    }
-
-    DrawLine(0, h / 2, w, h / 2, WHITE);
-    DrawLine(w / 2, 0, w / 2, h, WHITE);
-  }
-  EndTextureMode();
-  EndDrawing();
-
   SetTargetFPS(60);
 
   while (!WindowShouldClose()) {
+
+    BeginTextureMode(texture);
+    {
+      ClearBackground(BLACK);
+      DrawRectangle(0, 0, h, w, BLACK);
+    }
+    EndTextureMode();
+
     BeginDrawing();
-    DrawTexture(texture.texture, 0, 0, WHITE);
+    {
+      ClearBackground(BLACK);
+
+      BeginShaderMode(shader);
+      DrawTexture(texture.texture, 0, 0, WHITE);
+      EndShaderMode();
+
+      for (size_t i = 0; i < size_roots; ++i) {
+        DrawCircle(w / 2 + scale_x * creal(roots[i]),
+                   h / 2 - scale_y * cimag(roots[i]),
+                   ROOT_RADIUS,
+                   WHITE);
+      }
+
+      DrawLine(0, h / 2, w, h / 2, WHITE);
+      DrawLine(w / 2, 0, w / 2, h, WHITE);
+    }
     EndDrawing();
   }
 
