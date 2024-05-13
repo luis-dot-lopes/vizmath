@@ -89,7 +89,7 @@ main(void)
   int c2_loc = GetShaderLocation(shader, "c2");
   int c3_loc = GetShaderLocation(shader, "c3");
 
-  float zoom[] = { 4.0, 3.0 };
+  float zoom[] = { 8.0, 6.0 };
   float offset[] = { 0.5, 0.5 };
 
   float r1[] = { -2.0, 0.0 };
