@@ -20,7 +20,7 @@ typedef struct
   double complex coeff[MAX_DEGREE + 1];
 } Polynomial;
 
-// f'(x0) / f(x0)
+// f(x0) / f'(x0)
 double complex
 newton_poly_ratio(double complex x, Polynomial* p)
 {
@@ -77,6 +77,9 @@ main(void)
   Polynomial p = { .degree = 3,
                    .coeff = { 1.0, -1.0 - I, -6.0 - 2.0 * I, 0.0 } };
 
+  int zoom_loc = GetShaderLocation(shader, "zoom");
+  int offset_loc = GetShaderLocation(shader, "offset");
+
   int r1_loc = GetShaderLocation(shader, "r1");
   int r2_loc = GetShaderLocation(shader, "r2");
   int r3_loc = GetShaderLocation(shader, "r3");
@@ -86,6 +89,9 @@ main(void)
   int c2_loc = GetShaderLocation(shader, "c2");
   int c3_loc = GetShaderLocation(shader, "c3");
 
+  float zoom[] = { 4.0, 3.0 };
+  float offset[] = { 0.5, 0.5 };
+
   float r1[] = { -2.0, 0.0 };
   float r2[] = { 0.0, 0.0 };
   float r3[] = { 3.0, 1.0 };
@@ -94,6 +100,9 @@ main(void)
   float c1[] = { -6.0, -2.0 };
   float c2[] = { -1.0, -1.0 };
   float c3[] = { 1.0, 0.0 };
+
+  SetShaderValue(shader, zoom_loc, zoom, SHADER_UNIFORM_VEC2);
+  SetShaderValue(shader, offset_loc, offset, SHADER_UNIFORM_VEC2);
 
   SetShaderValue(shader, r1_loc, r1, SHADER_UNIFORM_VEC2);
   SetShaderValue(shader, r2_loc, r2, SHADER_UNIFORM_VEC2);
@@ -111,6 +120,24 @@ main(void)
   SetTargetFPS(60);
 
   while (!WindowShouldClose()) {
+
+    if (IsKeyPressed(KEY_D)) {
+      offset[0] -= 0.01f;
+    } else if (IsKeyPressed(KEY_S)) {
+      offset[1] -= 0.01f;
+    } else if (IsKeyPressed(KEY_A)) {
+      offset[0] += 0.01f;
+    } else if (IsKeyPressed(KEY_W)) {
+      offset[1] += 0.01f;
+    } else if (IsKeyPressed(KEY_Z)) {
+      zoom[0] *= 0.99f;
+      zoom[1] *= 0.99f;
+    } else if (IsKeyPressed(KEY_X)) {
+      zoom[0] *= 1.01f;
+      zoom[1] *= 1.01f;
+    }
+    SetShaderValue(shader, offset_loc, offset, SHADER_UNIFORM_VEC2);
+    SetShaderValue(shader, zoom_loc, zoom, SHADER_UNIFORM_VEC2);
 
     BeginTextureMode(texture);
     {
@@ -139,6 +166,9 @@ main(void)
     }
     EndDrawing();
   }
+
+  UnloadRenderTexture(texture);
+  UnloadShader(shader);
 
   return 0;
 }
