@@ -1,6 +1,7 @@
 #version 330
 
-const int iterations = 20;
+const int iterations = 10;
+const float circle_radius = 0.1;
 
 in vec2 fragTexCoord;
 
@@ -41,6 +42,12 @@ vec2 newton(vec2 x) {
 void main()
 {
 	vec2 z = vec2(zoom.x, -zoom.y) * (fragTexCoord - offset);
+	if(length(r1 - z) < circle_radius || 
+	   length(r2 - z) < circle_radius || 
+	   length(r3 - z) < circle_radius) {
+		fragColor = vec4(1.0);
+		return;
+	}
 	z = newton(z);
 	float min_dist = length(r1 - z);
 	fragColor = vec4(1.0, 0.0, 0.0, 1.0);
