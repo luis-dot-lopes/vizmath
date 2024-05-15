@@ -158,35 +158,18 @@ main(void)
     } else if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
       selected_root = size_roots;
     }
-    switch (selected_root) {
-      case 0: {
-        r1[0] = creal(z);
-        r1[1] = cimag(z);
-        SetShaderValue(shader, r1_loc, r1, SHADER_UNIFORM_VEC2);
-      } break;
-
-      case 1: {
-        r2[0] = creal(z);
-        r2[1] = cimag(z);
-        SetShaderValue(shader, r2_loc, r2, SHADER_UNIFORM_VEC2);
-
-      } break;
-
-      case 2: {
-        r3[0] = creal(z);
-        r3[1] = cimag(z);
-        SetShaderValue(shader, r3_loc, r3, SHADER_UNIFORM_VEC2);
-
-      } break;
-
-      default:
-        break;
-    }
     if (selected_root < size_roots) {
+      roots[selected_root] = z;
       recalculate_coefficients(roots, &p);
+      r1[0] = creal(roots[0]), r1[1] = cimag(roots[0]);
+      r2[0] = creal(roots[1]), r2[1] = cimag(roots[1]);
+      r3[0] = creal(roots[2]), r3[1] = cimag(roots[2]);
       c0[0] = creal(p.coeff[3]), c0[1] = cimag(p.coeff[3]);
       c1[0] = creal(p.coeff[2]), c1[1] = cimag(p.coeff[2]);
       c2[0] = creal(p.coeff[1]), c2[1] = cimag(p.coeff[1]);
+      SetShaderValue(shader, r1_loc, r1, SHADER_UNIFORM_VEC2);
+      SetShaderValue(shader, r2_loc, r2, SHADER_UNIFORM_VEC2);
+      SetShaderValue(shader, r3_loc, r3, SHADER_UNIFORM_VEC2);
       SetShaderValue(shader, c0_loc, c0, SHADER_UNIFORM_VEC2);
       SetShaderValue(shader, c1_loc, c1, SHADER_UNIFORM_VEC2);
       SetShaderValue(shader, c2_loc, c2, SHADER_UNIFORM_VEC2);
