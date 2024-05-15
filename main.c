@@ -58,17 +58,22 @@ closest_root(double complex z, double complex* roots, size_t size_roots)
   return min;
 }
 
+//(x - a)(x - b)(x - c) =
+// x ^ 3 - (a + b + c) x ^2 + (ab + bc + ac) x -abc
 void
-recalculate_coefficients()
+recalculate_coefficients(complex double* roots, Polynomial* p)
 {
+  p->coeff[1] = -(roots[0] + roots[1] + roots[2]);
+  p->coeff[2] = roots[0] * roots[1] + roots[1] * roots[2] + roots[0] * roots[2];
+  p->coeff[3] = -roots[0] * roots[1] * roots[2];
 }
 
 int
 main(void)
 {
 
-  const double complex roots[] = { -2.0, 0.0, 3.0 + 1.0 * I };
-  const size_t size_roots = sizeof(roots) / sizeof(roots[0]);
+  double complex roots[] = { -2.0, 0.0, 3.0 + 1.0 * I };
+  size_t size_roots = sizeof(roots) / sizeof(roots[0]);
   size_t selected_root = size_roots;
 
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Newton's Method");
@@ -146,6 +151,7 @@ main(void)
       for (size_t i = 0; i < size_roots; ++i) {
         if (cabs(z - roots[i]) < 0.1) {
           selected_root = i;
+          roots[i] = z;
           break;
         }
       }
@@ -175,6 +181,15 @@ main(void)
 
       default:
         break;
+    }
+    if (selected_root < size_roots) {
+      recalculate_coefficients(roots, &p);
+      c0[0] = creal(p.coeff[3]), c0[1] = cimag(p.coeff[3]);
+      c1[0] = creal(p.coeff[2]), c1[1] = cimag(p.coeff[2]);
+      c2[0] = creal(p.coeff[1]), c2[1] = cimag(p.coeff[1]);
+      SetShaderValue(shader, c0_loc, c0, SHADER_UNIFORM_VEC2);
+      SetShaderValue(shader, c1_loc, c1, SHADER_UNIFORM_VEC2);
+      SetShaderValue(shader, c2_loc, c2, SHADER_UNIFORM_VEC2);
     }
     SetShaderValue(shader, offset_loc, offset, SHADER_UNIFORM_VEC2);
     SetShaderValue(shader, zoom_loc, zoom, SHADER_UNIFORM_VEC2);
