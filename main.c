@@ -17,47 +17,6 @@ typedef struct
   double complex coeff[MAX_DEGREE + 1];
 } Polynomial;
 
-// f(x0) / f'(x0)
-double complex
-newton_poly_ratio(double complex x, Polynomial* p)
-{
-  double complex r1 = 0.0;
-  for (size_t i = 0; i <= p->degree; ++i) {
-    r1 = r1 * x + p->coeff[i];
-  }
-  double complex r2 = 0.0;
-  for (size_t i = 0; i < p->degree; ++i) {
-    r2 = r2 * x + (double complex)(p->degree - i) * p->coeff[i];
-  }
-  return r1 / r2;
-}
-
-double complex
-newton_method_polynomial(double complex x0, Polynomial* p)
-{
-  for (size_t i = 0; i < ITERATIONS; ++i) {
-    x0 = x0 - newton_poly_ratio(x0, p);
-  }
-  return x0;
-}
-
-// assumes at least one root
-size_t
-closest_root(double complex z, double complex* roots, size_t size_roots)
-{
-
-  size_t min = 0;
-  double min_dist = cabs(roots[0] - z);
-  double dist;
-  for (size_t i = 1; i < size_roots; ++i) {
-    if ((dist = cabs(roots[i] - z)) < min_dist) {
-      min = i;
-      min_dist = dist;
-    }
-  }
-  return min;
-}
-
 //(x - a)(x - b)(x - c) =
 // x ^ 3 - (a + b + c) x ^2 + (ab + bc + ac) x -abc
 void
@@ -85,6 +44,8 @@ main(void)
   Polynomial p = { .degree = 3,
                    .coeff = { 1.0, -1.0 - I, -6.0 - 2.0 * I, 0.0 } };
 
+  int iterations_loc = GetShaderLocation(shader, "iterations");
+
   int zoom_loc = GetShaderLocation(shader, "zoom");
   int offset_loc = GetShaderLocation(shader, "offset");
 
@@ -97,6 +58,8 @@ main(void)
   int c2_loc = GetShaderLocation(shader, "c2");
   int c3_loc = GetShaderLocation(shader, "c3");
 
+  int iterations = 0;
+
   float zoom[] = { 8.0, 6.0 };
   float offset[] = { 0.5, 0.5 };
 
@@ -108,6 +71,8 @@ main(void)
   float c1[] = { -6.0, -2.0 };
   float c2[] = { -1.0, -1.0 };
   float c3[] = { 1.0, 0.0 };
+
+  SetShaderValue(shader, iterations_loc, &iterations, SHADER_UNIFORM_INT);
 
   SetShaderValue(shader, zoom_loc, zoom, SHADER_UNIFORM_VEC2);
   SetShaderValue(shader, offset_loc, offset, SHADER_UNIFORM_VEC2);
@@ -146,6 +111,12 @@ main(void)
       zoom[1] *= 1.01f;
       offset[0] += (0.5 - offset[0]) * 0.01f / 1.01f;
       offset[1] += (0.5 - offset[1]) * 0.01f / 1.01f;
+    } else if (IsKeyPressed(KEY_N)) {
+      iterations++;
+      SetShaderValue(shader, iterations_loc, &iterations, SHADER_UNIFORM_INT);
+    } else if (IsKeyPressed(KEY_P)) {
+      iterations--;
+      SetShaderValue(shader, iterations_loc, &iterations, SHADER_UNIFORM_INT);
     }
     int mx = GetMouseX();
     int my = GetMouseY();

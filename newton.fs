@@ -1,11 +1,13 @@
 #version 330
 
-const int iterations = 15;
+//const int iterations = 15;
 const float circle_radius = 0.1;
 
 in vec2 fragTexCoord;
 
 out vec4 fragColor;
+
+uniform int iterations;
 
 uniform vec2 offset;
 uniform vec2 zoom;
