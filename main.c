@@ -139,9 +139,13 @@ main(void)
     } else if (IsKeyDown(KEY_Z)) {
       zoom[0] *= 0.99f;
       zoom[1] *= 0.99f;
+      offset[0] += (offset[0] - 0.5) * 0.01f / 0.99f;
+      offset[1] += (offset[1] - 0.5) * 0.01f / 0.99f;
     } else if (IsKeyDown(KEY_X)) {
       zoom[0] *= 1.01f;
       zoom[1] *= 1.01f;
+      offset[0] += (0.5 - offset[0]) * 0.01f / 1.01f;
+      offset[1] += (0.5 - offset[1]) * 0.01f / 1.01f;
     }
     int mx = GetMouseX();
     int my = GetMouseY();
@@ -191,6 +195,9 @@ main(void)
       BeginShaderMode(shader);
       DrawTexture(texture.texture, 0, 0, WHITE);
       EndShaderMode();
+
+      DrawLine(w / 2, 0, w / 2, h, WHITE);
+      DrawLine(0, h / 2, w, h / 2, WHITE);
     }
     EndDrawing();
   }

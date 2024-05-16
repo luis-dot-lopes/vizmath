@@ -1,6 +1,6 @@
 #version 330
 
-const int iterations = 10;
+const int iterations = 15;
 const float circle_radius = 0.1;
 
 in vec2 fragTexCoord;
