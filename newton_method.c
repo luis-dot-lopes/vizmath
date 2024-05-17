@@ -90,8 +90,6 @@ main(void)
 
   while (!WindowShouldClose()) {
     int h = GetScreenHeight(), w = GetScreenWidth();
-    double scale_x = w / zoom[1];
-    double scale_y = h / zoom[1];
 
     if (IsKeyDown(KEY_D)) {
       offset[0] -= 0.01f;
