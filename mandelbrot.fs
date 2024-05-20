@@ -1,6 +1,6 @@
 #version 330
 
-const int iterations = 50;
+const int iterations = 100;
 
 in vec2 fragTexCoord;
 
@@ -18,10 +18,11 @@ void main() {
 	vec2 z = vec2(0.0);
 	for(int i = 0; i < iterations; ++i) {
 		z = cm(z, z) + c;
-		if(dot(z, z) >= 4.0) {
-			fragColor = vec4(0.0);
+		if(length(z) > 2.0) {
+			float t = float(i) / float(iterations);
+			fragColor = vec4(smoothstep(0.0, 1.0,t), smoothstep(0.0, 0.5, t), smoothstep(0.5, 1.0, t), 1.0);
 			return;
 		}
 	}
-	fragColor = vec4(1.0);
+	fragColor = vec4(0.0);
 }

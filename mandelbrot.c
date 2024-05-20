@@ -12,7 +12,7 @@ main(void)
   Shader shader = LoadShader(0, "mandelbrot.fs");
   RenderTexture2D texture = LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-  float zoom[] = { 4.5, 4.5 };
+  float zoom[] = { 6.0, 4.5 };
   float offset[] = { 0.5, 0.5 };
 
   int zoom_loc = GetShaderLocation(shader, "zoom");
