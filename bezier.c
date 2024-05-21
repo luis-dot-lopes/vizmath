@@ -108,6 +108,11 @@ main(void)
   while (!WindowShouldClose()) {
     int h = GetScreenHeight(), w = GetScreenWidth();
 
+    if (IsKeyPressed(KEY_R)) {
+      UnloadShader(shader);
+      shader = LoadShader(0, "bezier.fs");
+    }
+
     BeginTextureMode(texture);
     {
       ClearBackground(BLACK);
@@ -125,6 +130,9 @@ main(void)
     }
     EndDrawing();
   }
+
+  UnloadRenderTexture(texture);
+  UnloadShader(shader);
 
   return 0;
 }
