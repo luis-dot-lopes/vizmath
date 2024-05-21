@@ -18,7 +18,7 @@ bool line(vec2 a, vec2 b, vec2 p) {
 }
 
 vec2 newton_bezier(vec2 t, vec2 p) {
-	for(int i = 0; i < 40; ++i) {
+	for(int i = 0; i < 5; ++i) {
 		vec2 it = vec2(1.0) - t;
 		//t.x -= (it.x * it.x * p0.x + 2 * it.x * t.x * p1.x + t.x * t.x * p2.x - p.x)/(2*it.x*(p1.x - p0.x) + 2*t.x*(p2.x - p1.x));
 		//t.y -= (it.y * it.y * p0.y + 2 * it.y * t.y * p1.y + t.y * t.y * p2.y - p.y)/(2*it.y*(p1.y - p0.y) + 2*t.y*(p2.y - p1.y));
@@ -52,8 +52,11 @@ void main() {
 		return;
 	}
 	*/
-	vec2 t = newton_bezier(vec2(1.0, 1.0), z);
-	if(0.0 <= t.x && t.x <= 1.0 && abs(t.x - t.y) < 0.01) {
+	vec2 t0 = vec2((clamp(z.x, p0.x, p2.x) - p0.x) / (p2.x - p0.x));
+	vec2 t = newton_bezier(t0, z);
+	float it = 1.0 - t.x;
+	vec2 b = it * it * p0 + 2 * it * t.x * p1 + t.x * t.x * p2;
+	if(0.0 <= t.x && t.x <= 1.0 && abs(t.x - t.y) < 0.01 && dot(b - z, b - z) < 1e-6) {
 		fragColor = vec4(1.0, 0.0, 0.0, 1.0);
 		return;
 	}
