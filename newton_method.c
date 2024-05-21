@@ -31,7 +31,7 @@ int
 main(void)
 {
 
-  double complex roots[] = { -2.0, 0.0, 3.0 + 1.0 * I };
+  double complex roots[] = { -2.0, 0.0, 3.0 + 1.0 * I, 1.0 };
   size_t size_roots = sizeof(roots) / sizeof(roots[0]);
   size_t selected_root = size_roots;
 
@@ -52,6 +52,7 @@ main(void)
   int r1_loc = GetShaderLocation(shader, "r1");
   int r2_loc = GetShaderLocation(shader, "r2");
   int r3_loc = GetShaderLocation(shader, "r3");
+  int point_loc = GetShaderLocation(shader, "point");
 
   int c0_loc = GetShaderLocation(shader, "c0");
   int c1_loc = GetShaderLocation(shader, "c1");
@@ -66,6 +67,7 @@ main(void)
   float r1[] = { -2.0, 0.0 };
   float r2[] = { 0.0, 0.0 };
   float r3[] = { 3.0, 1.0 };
+  float point[] = { 1.0, 0.0 };
 
   float c0[] = { 0.0, 0.0 };
   float c1[] = { -6.0, -2.0 };
@@ -80,6 +82,7 @@ main(void)
   SetShaderValue(shader, r1_loc, r1, SHADER_UNIFORM_VEC2);
   SetShaderValue(shader, r2_loc, r2, SHADER_UNIFORM_VEC2);
   SetShaderValue(shader, r3_loc, r3, SHADER_UNIFORM_VEC2);
+  SetShaderValue(shader, point_loc, point, SHADER_UNIFORM_VEC2);
 
   SetShaderValue(shader, c0_loc, c0, SHADER_UNIFORM_VEC2);
   SetShaderValue(shader, c1_loc, c1, SHADER_UNIFORM_VEC2);
@@ -137,12 +140,14 @@ main(void)
       r1[0] = creal(roots[0]), r1[1] = cimag(roots[0]);
       r2[0] = creal(roots[1]), r2[1] = cimag(roots[1]);
       r3[0] = creal(roots[2]), r3[1] = cimag(roots[2]);
+      point[0] = creal(roots[3]), point[1] = cimag(roots[3]);
       c0[0] = creal(p.coeff[3]), c0[1] = cimag(p.coeff[3]);
       c1[0] = creal(p.coeff[2]), c1[1] = cimag(p.coeff[2]);
       c2[0] = creal(p.coeff[1]), c2[1] = cimag(p.coeff[1]);
       SetShaderValue(shader, r1_loc, r1, SHADER_UNIFORM_VEC2);
       SetShaderValue(shader, r2_loc, r2, SHADER_UNIFORM_VEC2);
       SetShaderValue(shader, r3_loc, r3, SHADER_UNIFORM_VEC2);
+      SetShaderValue(shader, point_loc, point, SHADER_UNIFORM_VEC2);
       SetShaderValue(shader, c0_loc, c0, SHADER_UNIFORM_VEC2);
       SetShaderValue(shader, c1_loc, c1, SHADER_UNIFORM_VEC2);
       SetShaderValue(shader, c2_loc, c2, SHADER_UNIFORM_VEC2);
