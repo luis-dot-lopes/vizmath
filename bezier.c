@@ -8,7 +8,7 @@
 #define NODE_CAP 10
 
 int
-main(void)
+main2(void)
 {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Bezier Curves");
 
@@ -88,6 +88,40 @@ main(void)
         DrawCircleV(lerp_nodes[0], 2, RED);
         p = lerp_nodes[0];
       }
+    }
+    EndDrawing();
+  }
+
+  return 0;
+}
+
+int
+main(void)
+{
+  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Bezier curves - shaders");
+
+  Shader shader = LoadShader(0, "bezier.fs");
+  RenderTexture2D texture = LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+  SetTargetFPS(60);
+
+  while (!WindowShouldClose()) {
+    int h = GetScreenHeight(), w = GetScreenWidth();
+
+    BeginTextureMode(texture);
+    {
+      ClearBackground(BLACK);
+      DrawRectangle(0, 0, w, h, BLACK);
+    }
+    EndTextureMode();
+
+    BeginDrawing();
+    {
+      ClearBackground(BLACK);
+
+      BeginShaderMode(shader);
+      DrawTexture(texture.texture, 0, 0, WHITE);
+      EndShaderMode();
     }
     EndDrawing();
   }
