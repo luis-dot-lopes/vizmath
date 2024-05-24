@@ -6,9 +6,9 @@ in vec2 fragTexCoord;
 
 out vec4 fragColor;
 
-const vec2 p0 = {0.25, 0.33};
-const vec2 p1 = {0.5, 0.66};
-const vec2 p2 = {0.75, 0.33};
+uniform vec2 p0;
+uniform vec2 p1;
+uniform vec2 p2;
 
 bool line(vec2 a, vec2 b, vec2 p) {
 	vec2 ba = b - a;
@@ -47,7 +47,7 @@ void main() {
 	float t = minimum_bezier(0.5, z);
 	float it = 1.0 - t;
 	vec2 b = it * it * p0 + 2 * it * t * p1 + t * t * p2;
-	if(0 <= t && t <= 1 && length(b - z) < 0.002) {
+	if(0 <= t && t <= 1 && length(b - z) <= 0.002) {
 		fragColor = vec4(1.0, 0.0, 0.0, 1.0);
 		return;
 	}

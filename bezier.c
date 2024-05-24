@@ -105,8 +105,52 @@ main(void)
 
   SetTargetFPS(60);
 
+  Vector2 nodes[NODE_CAP] = { { 0.25, 0.33 }, { 0.5, 0.66 }, { 0.75, 0.33 } };
+  int node_count = 3;
+  int selected_node = node_count;
+
+  float p0[] = { nodes[0].x, nodes[0].y };
+  float p1[] = { nodes[1].x, nodes[1].y };
+  float p2[] = { nodes[2].x, nodes[2].y };
+
+  int p0_loc = GetShaderLocation(shader, "p0");
+  int p1_loc = GetShaderLocation(shader, "p1");
+  int p2_loc = GetShaderLocation(shader, "p2");
+
+  SetShaderValue(shader, p0_loc, p0, SHADER_UNIFORM_VEC2);
+  SetShaderValue(shader, p1_loc, p1, SHADER_UNIFORM_VEC2);
+  SetShaderValue(shader, p2_loc, p2, SHADER_UNIFORM_VEC2);
+
   while (!WindowShouldClose()) {
     int h = GetScreenHeight(), w = GetScreenWidth();
+
+    Vector2 mouse = GetMousePosition();
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+      for (int i = 0; i < node_count; ++i) {
+        Vector2 node_scaled = { .x = nodes[i].x * w,
+                                .y = nodes[i].y * h * 0.75 };
+        float real_radius = w * 0.01f;
+        if (CheckCollisionPointCircle(mouse, node_scaled, real_radius)) {
+          selected_node = i;
+          break;
+        }
+      }
+    } else if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+      selected_node = node_count;
+    }
+
+    if (selected_node < node_count) {
+      nodes[selected_node].x = mouse.x / (float)w;
+      nodes[selected_node].y = mouse.y / (float)h * 4.0f / 3.0f;
+
+      p0[0] = nodes[0].x, p0[1] = nodes[0].y;
+      p1[0] = nodes[1].x, p1[1] = nodes[1].y;
+      p2[0] = nodes[2].x, p2[1] = nodes[2].y;
+
+      SetShaderValue(shader, p0_loc, p0, SHADER_UNIFORM_VEC2);
+      SetShaderValue(shader, p1_loc, p1, SHADER_UNIFORM_VEC2);
+      SetShaderValue(shader, p2_loc, p2, SHADER_UNIFORM_VEC2);
+    }
 
     if (IsKeyPressed(KEY_R)) {
       UnloadShader(shader);
@@ -127,6 +171,10 @@ main(void)
       BeginShaderMode(shader);
       DrawTexture(texture.texture, 0, 0, WHITE);
       EndShaderMode();
+
+      for (int i = 0; i < node_count; ++i) {
+        DrawCircle(nodes[i].x * w, nodes[i].y * h * 0.75f, 0.01f * w, GREEN);
+      }
     }
     EndDrawing();
   }
