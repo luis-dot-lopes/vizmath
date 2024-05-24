@@ -28,7 +28,13 @@ main(void)
 
   size_t shader_size;
   char* shader_text = load_file("grapher.fs", &shader_size);
-  size_t shader_write_loc = 197;
+  size_t shader_write_loc = 0;
+  for (size_t i = 0; i < shader_size - 1; ++i) {
+    if (shader_text[i] == '%' && shader_text[i + 1] == 's') {
+      shader_write_loc = i;
+      break;
+    }
+  }
   shader_text[shader_write_loc++] = 'y';
   shader_text[shader_write_loc++] = '-';
   shader_text[shader_write_loc++] = 'x';
